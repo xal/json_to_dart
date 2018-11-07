@@ -289,11 +289,43 @@ class ClassDefinition {
     return sb.toString();
   }
 
+  String get _equalFunc {
+    final sb = StringBuffer();
+    sb.write(
+      '@override bool operator==(Object other) => identical(this, other) || other is $name && runtimeType == other.runtimeType &&',
+    );
+    for (int i = 0; i < fields.keys.length; i++) {
+      final k = fields.keys.toList()[i];
+      if (i < fields.keys.length - 1) {
+        sb.write('$k == other.$k &&');
+      } else {
+        sb.write('$k == other.$k;');
+      }
+    }
+    return sb.toString();
+  }
+
+  String get _hashCodeFunc {
+    final sb = StringBuffer();
+    sb.write(
+      '@override int get hashCode => ',
+    );
+    for (int i = 0; i < fields.keys.length; i++) {
+      final k = fields.keys.toList()[i];
+      if (i < fields.keys.length - 1) {
+        sb.write('$k.hashCode ^');
+      } else {
+        sb.write('$k.hashCode;');
+      }
+    }
+    return sb.toString();
+  }
+
   String toString() {
     if (privateFields) {
-      return 'class $name {\n$_fieldList\n\n$_defaultPrivateConstructor\n\n$_gettersSetters\n\n$_jsonParseFunc\n\n$_jsonGenFunc\n\n$_copyWithFunc\n\n$_toStringFunc\n}\n';
+      return 'class $name {\n$_fieldList\n\n$_defaultPrivateConstructor\n\n$_gettersSetters\n\n$_jsonParseFunc\n\n$_jsonGenFunc\n\n$_copyWithFunc\n\n$_equalFunc\n\n$_hashCodeFunc\n\n$_toStringFunc\n}\n';
     } else {
-      return 'class $name {\n$_fieldList\n\n$_defaultConstructor\n\n$_jsonParseFunc\n\n$_jsonGenFunc\n\n$_copyWithFunc\n\n$_toStringFunc\n}\n';
+      return 'class $name {\n$_fieldList\n\n$_defaultConstructor\n\n$_jsonParseFunc\n\n$_jsonGenFunc\n\n$_copyWithFunc\n\n$_equalFunc\n\n$_hashCodeFunc\n\n$_toStringFunc\n}\n';
     }
   }
 }
