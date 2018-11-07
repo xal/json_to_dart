@@ -21,8 +21,8 @@ class ModelGenerator {
       final classDefinition = ClassDefinition(className, _privateFields);
       keys.forEach((key) {
         final typeDef = TypeDefinition.fromDynamic(jsonRawData[key]);
-        if (typeDef.name == 'Class') {
-          typeDef.name = camelCase(key);
+        if (typeDef.type == 'Class') {
+          typeDef.type = camelCase(key);
         }
         if (typeDef.subtype != null && typeDef.subtype == 'Class') {
           typeDef.subtype = camelCase(key);
@@ -36,7 +36,7 @@ class ModelGenerator {
       }
       final dependencies = classDefinition.dependencies;
       dependencies.forEach((dependency) {
-        if (dependency.typeDef.name == 'List') {
+        if (dependency.typeDef.type == 'List') {
           if (jsonRawData[dependency.name].length as int > 0) {
             // only generate dependency class if the array is not empty
             _generateClassDefinition(dependency.className,

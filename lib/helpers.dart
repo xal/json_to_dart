@@ -52,7 +52,7 @@ String fixFieldName(
 }) {
   var properName = name;
   if (name.startsWith('_') || name.startsWith(RegExp(r'[0-9]'))) {
-    final firstCharType = typeDef.name.substring(0, 1).toLowerCase();
+    final firstCharType = typeDef.type.substring(0, 1).toLowerCase();
     properName = '$firstCharType$name';
   }
   if (privateField) {

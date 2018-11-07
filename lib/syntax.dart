@@ -1,7 +1,7 @@
 import './helpers.dart';
 
 class TypeDefinition {
-  String name;
+  String type;
   String subtype;
   bool _isPrimitive = false;
 
@@ -21,27 +21,27 @@ class TypeDefinition {
     return TypeDefinition(type);
   }
 
-  TypeDefinition(this.name, {this.subtype}) {
+  TypeDefinition(this.type, {this.subtype}) {
     if (subtype == null) {
-      _isPrimitive = isPrimitiveType(this.name) as bool;
+      _isPrimitive = isPrimitiveType(this.type) as bool;
     } else {
-      _isPrimitive = isPrimitiveType('$name<$subtype>') as bool;
+      _isPrimitive = isPrimitiveType('$type<$subtype>') as bool;
     }
   }
 
   bool get isPrimitive => _isPrimitive;
 
-  bool get isPrimitiveList => _isPrimitive && name == 'List';
+  bool get isPrimitiveList => _isPrimitive && type == 'List';
 
   operator ==(dynamic other) {
     if (other is TypeDefinition) {
-      return name == other.name && subtype == other.subtype;
+      return type == other.type && subtype == other.subtype;
     }
     return false;
   }
 
   String _buildParseClass(String expression) {
-    final properType = subtype != null ? subtype : name;
+    final properType = subtype != null ? subtype : type;
     return ' $properType.fromJson($expression)';
   }
 
@@ -54,11 +54,11 @@ class TypeDefinition {
     final fieldKey =
         fixFieldName(key, typeDef: this, privateField: privateField);
     if (isPrimitive) {
-      if (name == "List") {
+      if (type == "List") {
         return "$fieldKey = json['$key'].cast<$subtype>();";
       }
-      return "$fieldKey = json['$key'] as $name;";
-    } else if (name == 'List') {
+      return "$fieldKey = json['$key'] as $type;";
+    } else if (type == 'List') {
       // list of class
       return "if (json['$key'] != null) {\n\t\t\t$fieldKey =  List<$subtype>();\n\t\t\tjson['$key'].forEach((v) { $fieldKey.add( $subtype.fromJson(v as Map<String, dynamic>)); });\n\t\t}";
     } else {
@@ -76,7 +76,7 @@ class TypeDefinition {
     final thisKey = 'this.$fieldKey';
     if (isPrimitive) {
       return "data['$key'] = $thisKey;";
-    } else if (name == 'List') {
+    } else if (type == 'List') {
       // class list
       return """if ($thisKey != null) {
       data['$key'] = $thisKey.map((v) => ${_buildToJsonClass('v')}).toList();
@@ -150,7 +150,7 @@ class ClassDefinition {
   }
 
   void _addTypeDef(TypeDefinition typeDef, StringBuffer sb) {
-    sb.write('${typeDef.name}');
+    sb.write('${typeDef.type}');
     if (typeDef.subtype != null) {
       sb.write('<${typeDef.subtype}>');
     }
@@ -252,11 +252,48 @@ class ClassDefinition {
     return sb.toString();
   }
 
+  String get _copyWithFunc {
+    final sb = StringBuffer();
+    sb.write(
+      '$name copyWith({',
+    );
+    fields.keys.forEach((k) {
+      sb.write('${fields[k].type} $k,');
+    });
+    sb.write('}) {\n');
+    sb.write('return $name(');
+    fields.keys.forEach((k) {
+      sb.write('\n$k: $k ?? this.$k,\n');
+    });
+    sb.write('\t);');
+    sb.write('\t}');
+    return sb.toString();
+  }
+
+  String get _toStringFunc {
+    final sb = StringBuffer();
+    sb.write(
+      '@override String toString() {',
+    );
+    sb.write('return \'$name{');
+    for (int i = 0; i < fields.keys.length; i++) {
+      final k = fields.keys.toList()[i];
+      if (i < fields.keys.length - 1) {
+        sb.write('$k: \$$k, ');
+      } else {
+        sb.write('$k: \$$k');
+      }
+    }
+    sb.write('}\';');
+    sb.write('}');
+    return sb.toString();
+  }
+
   String toString() {
     if (privateFields) {
-      return 'class $name {\n$_fieldList\n\n$_defaultPrivateConstructor\n\n$_gettersSetters\n\n$_jsonParseFunc\n\n$_jsonGenFunc\n}\n';
+      return 'class $name {\n$_fieldList\n\n$_defaultPrivateConstructor\n\n$_gettersSetters\n\n$_jsonParseFunc\n\n$_jsonGenFunc\n\n$_copyWithFunc\n\n$_toStringFunc\n}\n';
     } else {
-      return 'class $name {\n$_fieldList\n\n$_defaultConstructor\n\n$_jsonParseFunc\n\n$_jsonGenFunc\n}\n';
+      return 'class $name {\n$_fieldList\n\n$_defaultConstructor\n\n$_jsonParseFunc\n\n$_jsonGenFunc\n\n$_copyWithFunc\n\n$_toStringFunc\n}\n';
     }
   }
 }
