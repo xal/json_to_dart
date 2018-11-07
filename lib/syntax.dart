@@ -275,16 +275,16 @@ class ClassDefinition {
     sb.write(
       '@override String toString() {',
     );
-    sb.write('return \'$name{');
+    sb.write('return \'\'\'$name{\n');
     for (int i = 0; i < fields.keys.length; i++) {
       final k = fields.keys.toList()[i];
       if (i < fields.keys.length - 1) {
-        sb.write('$k: \$$k, ');
+        sb.write('\t\t$k: \$$k,\n');
       } else {
-        sb.write('$k: \$$k');
+        sb.write('\t\t$k: \$$k');
       }
     }
-    sb.write('}\';');
+    sb.write('}\'\'\';');
     sb.write('}');
     return sb.toString();
   }
