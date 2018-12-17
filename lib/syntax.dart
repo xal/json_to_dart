@@ -271,22 +271,9 @@ class ClassDefinition {
   }
 
   String get _toStringFunc {
-    final sb = StringBuffer();
-    sb.write(
-      '@override String toString() {',
-    );
-    sb.write('return \'\'\'$name{\n');
-    for (int i = 0; i < fields.keys.length; i++) {
-      final k = fields.keys.toList()[i];
-      if (i < fields.keys.length - 1) {
-        sb.write('\t\t$k: \$$k,\n');
-      } else {
-        sb.write('\t\t$k: \$$k');
-      }
-    }
-    sb.write('}\'\'\';');
-    sb.write('}');
-    return sb.toString();
+    return '@override String toString() {'
+        ' return JsonEncoder.withIndent(\'  \').convert(toJson()); '
+        '}';
   }
 
   String get _equalFunc {
