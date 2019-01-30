@@ -230,11 +230,12 @@ class ClassDefinition {
 
   String get _jsonParseFunc {
     final sb = StringBuffer();
-    sb.write('\t$name');
-    sb.write('.fromJson(Map<String, dynamic> json) {\n');
+    sb.write('static \t$name fromJson(Map<String, dynamic> json) {\n');
+    sb.write('final bean = $name();');
     fields.keys.forEach((k) {
-      sb.write('\t\t${fields[k].jsonParseExpression(k, privateFields)}\n');
+      sb.write('\t\tbean.${fields[k].jsonParseExpression(k, privateFields)}\n');
     });
+    sb.write('return bean;');
     sb.write('\t}');
     return sb.toString();
   }
