@@ -60,7 +60,7 @@ class TypeDefinition {
       return "$fieldKey = json['$key'] as $type;";
     } else if (type == 'List') {
       // list of class
-      return "if (json['$key'] != null) {\n\t\t\t$fieldKey =  List<$subtype>();\n\t\t\tjson['$key'].forEach((v) { $fieldKey.add( $subtype.fromJson(v as Map<String, dynamic>)); });\n\t\t}";
+      return "if (json['$key'] != null) {\n\t\t\t$fieldKey =  List<$subtype>();\n\t\t\tjson['$key'].forEach((v) { $fieldKey.add( $subtype.fromJson(v as Map<String, Object>)); });\n\t\t}";
     } else {
       // class
       return "$fieldKey = json['$key'] != null ? ${_buildParseClass(jsonKey)} : null;";
@@ -230,7 +230,7 @@ class ClassDefinition {
 
   String get _jsonParseFunc {
     final sb = StringBuffer();
-    sb.write('static \t$name fromJson(Map<String, dynamic> json) {\n');
+    sb.write('static \t$name fromJson(Map<String, Object> json) {\n');
     sb.write('final bean = $name();');
     fields.keys.forEach((k) {
       sb.write('\t\tbean.${fields[k].jsonParseExpression(k, privateFields)}\n');
@@ -243,7 +243,7 @@ class ClassDefinition {
   String get _jsonGenFunc {
     final sb = StringBuffer();
     sb.write(
-      '\tMap<String, dynamic> toJson() {\n\t\tfinal data = <String, dynamic>{};\n',
+      '\tMap<String, Object> toJson() {\n\t\tfinal data = <String, Object>{};\n',
     );
     fields.keys.forEach((k) {
       sb.write('\t\t${fields[k].toJsonExpression(k, privateFields)}\n');
