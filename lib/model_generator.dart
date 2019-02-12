@@ -1,4 +1,5 @@
 import 'package:dart_style/dart_style.dart';
+
 import './helpers.dart';
 import './syntax.dart';
 
@@ -56,8 +57,7 @@ class ModelGenerator {
   String generateDartClasses(String rawJson) {
     final Map<String, dynamic> jsonRawData = decodeJSON(rawJson);
     _generateClassDefinition(_rootClassName, jsonRawData);
-    final unsafeDart =
-        'import \'dart:convert\'; ${allClasses.map((c) => c.toString()).join('\n')}';
+    final unsafeDart = allClasses.map((c) => c.toString()).join('\n');
     final formatter = DartFormatter();
     return formatter.format(unsafeDart);
   }
