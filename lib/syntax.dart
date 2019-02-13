@@ -227,7 +227,7 @@ class ClassDefinition {
 
   String get _jsonParseFunc {
     final sb = StringBuffer();
-    sb.write('static $name fromJson(Map<String, Object> json) {');
+    sb.write('static $name fromJson(Map<String, dynamic> json) {');
     sb.write('final bean = $name();');
     fields.keys.forEach((k) {
       sb.write(fields[k].jsonParseExpression(k, privateFields));
@@ -297,9 +297,9 @@ class ClassDefinition {
 
   String toString() {
     if (privateFields) {
-      return 'class $name {$_fieldList$_defaultPrivateConstructor$_gettersSetters$_jsonParseFunc$_jsonGenFunc$_copyWithFunc$_equalFunc$_hashCodeFunc$_toStringFunc}';
+      return 'class $name {\n$_fieldList\n\n$_defaultPrivateConstructor\n\n$_gettersSetters\n\n$_jsonParseFunc\n\n$_jsonGenFunc\n\n$_copyWithFunc\n\n$_equalFunc\n\n$_hashCodeFunc\n\n$_toStringFunc\n}\n';
     } else {
-      return 'class $name {$_fieldList$_defaultConstructor$_jsonParseFunc$_jsonGenFunc$_copyWithFunc$_equalFunc$_hashCodeFunc$_toStringFunc}';
+      return 'class $name {\n$_fieldList\n\n$_defaultConstructor\n\n$_jsonParseFunc\n\n$_jsonGenFunc\n\n$_copyWithFunc\n\n$_equalFunc\n\n$_hashCodeFunc\n\n$_toStringFunc\n}\n';
     }
   }
 }
