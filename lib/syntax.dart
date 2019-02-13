@@ -55,15 +55,15 @@ class TypeDefinition {
         fixFieldName(key, typeDef: this, privateField: privateField);
     if (isPrimitive) {
       if (type == "List") {
-        return "$fieldKey = json['$key'].cast<$subtype>();";
+        return "bean.$fieldKey = json['$key'].cast<$subtype>();";
       }
-      return "$fieldKey = json['$key'] as $type;";
+      return "bean.$fieldKey = json['$key'] as $type;";
     } else if (type == 'List') {
       // list of class
-      return "if (json['$key'] != null) {\n\t\t\t$fieldKey =  List<$subtype>();\n\t\t\tjson['$key'].forEach((v) { $fieldKey.add( $subtype.fromJson(v as Map<String, Object>)); });\n\t\t}";
+      return "if (json['$key'] != null) { bean.$fieldKey = List<$subtype>(); json['$key'].forEach((v) { bean.$fieldKey.add( $subtype.fromJson(v as Map<String, Object>)); }); }";
     } else {
       // class
-      return "$fieldKey = json['$key'] != null ? ${_buildParseClass(jsonKey)} : null;";
+      return "bean.$fieldKey = json['$key'] != null ? ${_buildParseClass(jsonKey)} : null;";
     }
   }
 
@@ -83,9 +83,7 @@ class TypeDefinition {
     }""";
     } else {
       // class
-      return """if ($thisKey != null) {
-      data['$key'] = ${_buildToJsonClass(thisKey)};
-    }""";
+      return "if ($thisKey != null) { data['$key'] = ${_buildToJsonClass(thisKey)}; }";
     }
   }
 }
@@ -162,11 +160,10 @@ class ClassDefinition {
       final fieldName =
           fixFieldName(key, typeDef: f, privateField: privateFields);
       final sb = StringBuffer();
-      sb.write('\t');
       _addTypeDef(f, sb);
       sb.write(' $fieldName;');
       return sb.toString();
-    }).join('\n');
+    }).join('');
   }
 
   String get _gettersSetters {
@@ -177,19 +174,19 @@ class ClassDefinition {
       final privateFieldName =
           fixFieldName(key, typeDef: f, privateField: true);
       final sb = StringBuffer();
-      sb.write('\t');
+      sb.write('');
       _addTypeDef(f, sb);
       sb.write(
-          ' get $publicFieldName => $privateFieldName;\n\tset $publicFieldName(');
+          ' get $publicFieldName => $privateFieldName;set $publicFieldName(');
       _addTypeDef(f, sb);
       sb.write(' $publicFieldName) => $privateFieldName = $publicFieldName;');
       return sb.toString();
-    }).join('\n');
+    }).join('');
   }
 
   String get _defaultPrivateConstructor {
     final sb = StringBuffer();
-    sb.write('\t$name({');
+    sb.write('$name({');
     fields.keys.forEach((key) {
       final f = fields[key];
       final publicFieldName = fixFieldName(
@@ -201,14 +198,14 @@ class ClassDefinition {
       sb.write(' $publicFieldName');
       sb.write(', ');
     });
-    sb.write('}) {\n');
+    sb.write('}) {');
     fields.keys.forEach((key) {
       final f = fields[key];
       final publicFieldName =
           fixFieldName(key, typeDef: f, privateField: false);
       final privateFieldName =
           fixFieldName(key, typeDef: f, privateField: true);
-      sb.write('this.$privateFieldName = $publicFieldName;\n');
+      sb.write('this.$privateFieldName = $publicFieldName;');
     });
     sb.write('}');
     return sb.toString();
@@ -216,7 +213,7 @@ class ClassDefinition {
 
   String get _defaultConstructor {
     final sb = StringBuffer();
-    sb.write('\t$name({');
+    sb.write('$name({');
     fields.keys.forEach((key) {
       final f = fields[key];
       final fieldName =
@@ -230,44 +227,35 @@ class ClassDefinition {
 
   String get _jsonParseFunc {
     final sb = StringBuffer();
-    sb.write('static \t$name fromJson(Map<String, Object> json) {\n');
+    sb.write('static $name fromJson(Map<String, Object> json) {');
     sb.write('final bean = $name();');
     fields.keys.forEach((k) {
-      sb.write('\t\tbean.${fields[k].jsonParseExpression(k, privateFields)}\n');
+      sb.write(fields[k].jsonParseExpression(k, privateFields));
     });
-    sb.write('return bean;');
-    sb.write('\t}');
+    sb.write('return bean; }');
     return sb.toString();
   }
 
   String get _jsonGenFunc {
     final sb = StringBuffer();
     sb.write(
-      '\tMap<String, Object> toJson() {\n\t\tfinal data = <String, Object>{};\n',
+      'Map<String, Object> toJson() {final data = <String, Object>{};',
     );
     fields.keys.forEach((k) {
-      sb.write('\t\t${fields[k].toJsonExpression(k, privateFields)}\n');
+      sb.write('${fields[k].toJsonExpression(k, privateFields)}');
     });
-    sb.write('\t\treturn data;\n');
-    sb.write('\t}');
+    sb.write('return data;');
+    sb.write('}');
     return sb.toString();
   }
 
   String get _copyWithFunc {
     final sb = StringBuffer();
-    sb.write(
-      '$name copyWith({',
-    );
-    fields.keys.forEach((k) {
-      sb.write('${fields[k].type} $k,');
-    });
-    sb.write('}) {\n');
-    sb.write('return $name(');
-    fields.keys.forEach((k) {
-      sb.write('\n$k: $k ?? this.$k,\n');
-    });
-    sb.write('\t);');
-    sb.write('\t}');
+    sb.write('$name copyWith({');
+    fields.keys.forEach((k) => sb.write('${fields[k].type} $k,'));
+    sb.write('}) { return $name(');
+    fields.keys.forEach((k) => sb.write('$k: $k ?? this.$k,'));
+    sb.write('); }');
     return sb.toString();
   }
 
@@ -295,9 +283,7 @@ class ClassDefinition {
 
   String get _hashCodeFunc {
     final sb = StringBuffer();
-    sb.write(
-      '@override int get hashCode => ',
-    );
+    sb.write('@override int get hashCode => ');
     for (int i = 0; i < fields.keys.length; i++) {
       final k = fields.keys.toList()[i];
       if (i < fields.keys.length - 1) {
@@ -311,9 +297,9 @@ class ClassDefinition {
 
   String toString() {
     if (privateFields) {
-      return 'class $name {\n$_fieldList\n\n$_defaultPrivateConstructor\n\n$_gettersSetters\n\n$_jsonParseFunc\n\n$_jsonGenFunc\n\n$_copyWithFunc\n\n$_equalFunc\n\n$_hashCodeFunc\n\n$_toStringFunc\n}\n';
+      return 'class $name {$_fieldList$_defaultPrivateConstructor$_gettersSetters$_jsonParseFunc$_jsonGenFunc$_copyWithFunc$_equalFunc$_hashCodeFunc$_toStringFunc}';
     } else {
-      return 'class $name {\n$_fieldList\n\n$_defaultConstructor\n\n$_jsonParseFunc\n\n$_jsonGenFunc\n\n$_copyWithFunc\n\n$_equalFunc\n\n$_hashCodeFunc\n\n$_toStringFunc\n}\n';
+      return 'class $name {$_fieldList$_defaultConstructor$_jsonParseFunc$_jsonGenFunc$_copyWithFunc$_equalFunc$_hashCodeFunc$_toStringFunc}';
     }
   }
 }
