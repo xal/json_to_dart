@@ -239,13 +239,12 @@ class ClassDefinition {
   String get _jsonGenFunc {
     final sb = StringBuffer();
     sb.write(
-      'Map<String, Object> toJson() {final data = <String, Object>{};',
+      'Map<String, Object> toJson() {\n return {',
     );
     fields.keys.forEach((k) {
-      sb.write('${fields[k].toJsonExpression(k, privateFields)}');
+      sb.write('\'$k\': $k,');
     });
-    sb.write('return data;');
-    sb.write('}');
+    sb.write('};}');
     return sb.toString();
   }
 
