@@ -228,6 +228,7 @@ class ClassDefinition {
   String get _jsonParseFunc {
     final sb = StringBuffer();
     sb.write('static $name fromJson(Map<String, dynamic> json) {');
+    sb.write('if (json == null) return null;\n');
     sb.write('final bean = $name();');
     fields.keys.forEach((k) {
       sb.write(fields[k].jsonParseExpression(k, privateFields));
