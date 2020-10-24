@@ -57,10 +57,11 @@ class TypeDefinition {
       if (type == "List") {
         return "bean.$fieldKey = json['$key'].cast<$subtype>();";
       }
-      return "bean.$fieldKey = json['$key'] as $type;";
+      // return "bean.$fieldKey = json['$key']/* as $type */;";
+      return "bean.$fieldKey = json['$key'];";
     } else if (type == 'List') {
       // list of class
-      return "if (json['$key'] != null) { bean.$fieldKey = List<$subtype>(); json['$key'].forEach((v) { bean.$fieldKey.add( $subtype.fromJson(v as Map<String, Object>)); }); }";
+      return "if (json['$key'] != null) { bean.$fieldKey = <$subtype>[for (final item in json['$fieldKey']) $subtype.fromJson(item)]; }";
     } else {
       // class
       return "bean.$fieldKey = json['$key'] != null ? ${_buildParseClass(jsonKey)} : null;";
@@ -297,9 +298,11 @@ class ClassDefinition {
 
   String toString() {
     if (privateFields) {
-      return 'class $name {\n$_fieldList\n\n$_defaultPrivateConstructor\n\n$_gettersSetters\n\n$_jsonParseFunc\n\n$_jsonGenFunc\n\n$_copyWithFunc\n\n$_equalFunc\n\n$_hashCodeFunc\n\n$_toStringFunc\n}\n';
+      // return 'class $name {\n$_fieldList\n\n$_defaultPrivateConstructor\n\n$_gettersSetters\n\n$_jsonParseFunc\n\n$_jsonGenFunc\n\n$_copyWithFunc\n\n$_equalFunc\n\n$_hashCodeFunc\n\n$_toStringFunc\n}\n';
+      return 'class $name {\n$_fieldList\n\n$_defaultPrivateConstructor\n\n$_gettersSetters\n\n$_jsonParseFunc\n\n$_jsonGenFunc\n\n$_toStringFunc\n}\n';
     } else {
-      return 'class $name {\n$_fieldList\n\n$_defaultConstructor\n\n$_jsonParseFunc\n\n$_jsonGenFunc\n\n$_copyWithFunc\n\n$_equalFunc\n\n$_hashCodeFunc\n\n$_toStringFunc\n}\n';
+      // return 'class $name {\n$_fieldList\n\n$_defaultConstructor\n\n$_jsonParseFunc\n\n$_jsonGenFunc\n\n$_copyWithFunc\n\n$_equalFunc\n\n$_hashCodeFunc\n\n$_toStringFunc\n}\n';
+      return 'class $name {\n$_fieldList\n\n$_defaultConstructor\n\n$_jsonParseFunc\n\n$_jsonGenFunc\n\n$_toStringFunc\n}\n';
     }
   }
 }
