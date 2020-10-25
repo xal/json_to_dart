@@ -206,7 +206,7 @@ class ClassDefinition {
           fixFieldName(key, typeDef: f, privateField: false);
       final privateFieldName =
           fixFieldName(key, typeDef: f, privateField: true);
-      sb.write('this.$privateFieldName = $publicFieldName;');
+      sb.write('$privateFieldName = $publicFieldName;');
     });
     sb.write('}');
     return sb.toString();
@@ -244,7 +244,11 @@ class ClassDefinition {
       'Map<String, Object> toJson() {\n return {',
     );
     fields.keys.forEach((k) {
-      sb.write('\'$k\': $k,');
+      if (privateFields) {
+        sb.write('\'$k\': _$k,');
+      } else {
+        sb.write('\'$k\': $k,');
+      }
     });
     sb.write('};}');
     return sb.toString();
@@ -299,7 +303,7 @@ class ClassDefinition {
   String toString() {
     if (privateFields) {
       // return 'class $name {\n$_fieldList\n\n$_defaultPrivateConstructor\n\n$_gettersSetters\n\n$_jsonParseFunc\n\n$_jsonGenFunc\n\n$_copyWithFunc\n\n$_equalFunc\n\n$_hashCodeFunc\n\n$_toStringFunc\n}\n';
-      return 'class $name {\n$_fieldList\n\n$_defaultPrivateConstructor\n\n$_gettersSetters\n\n$_jsonParseFunc\n\n$_jsonGenFunc\n\n$_toStringFunc\n}\n';
+      return 'class $name {\n$_fieldList\n\n$_defaultPrivateConstructor\n\n$_jsonParseFunc\n\n$_jsonGenFunc\n\n$_toStringFunc\n}\n';
     } else {
       // return 'class $name {\n$_fieldList\n\n$_defaultConstructor\n\n$_jsonParseFunc\n\n$_jsonGenFunc\n\n$_copyWithFunc\n\n$_equalFunc\n\n$_hashCodeFunc\n\n$_toStringFunc\n}\n';
       return 'class $name {\n$_fieldList\n\n$_defaultConstructor\n\n$_jsonParseFunc\n\n$_jsonGenFunc\n\n$_toStringFunc\n}\n';
