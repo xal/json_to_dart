@@ -61,7 +61,7 @@ class TypeDefinition {
       return "bean.$fieldKey = json['$key'];";
     } else if (type == 'List') {
       // list of class
-      return "if (json['$key'] != null) { bean.$fieldKey = <$subtype>[for (final item in json['$fieldKey']) $subtype.fromJson(item)]; }";
+      return "if (json['$key'] != null) { bean.$fieldKey = <$subtype>[for (final item in json['$key']) $subtype.fromJson(item)]; }";
     } else {
       // class
       return "bean.$fieldKey = json['$key'] != null ? ${_buildParseClass(jsonKey)} : null;";
