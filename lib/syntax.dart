@@ -183,7 +183,7 @@ class ClassDefinition {
       final sb = StringBuffer();
       sb.write('');
       _addTypeDef(f, sb);
-      sb.write(' get $publicFieldName => $privateFieldName;');
+      sb.write(' get $publicFieldName => $privateFieldName;\n');
       return sb.toString();
     }).join('');
   }
