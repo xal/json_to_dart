@@ -101,10 +101,12 @@ class Dependency {
 class ClassDefinition {
   final String _name;
   final bool _privateFields;
+  final bool _needConstructor;
   final Map<String, TypeDefinition> fields = Map<String, TypeDefinition>();
 
   String get name => _name;
   bool get privateFields => _privateFields;
+  bool get needConstructor => _needConstructor;
 
   List<Dependency> get dependencies {
     final dependenciesList = List<Dependency>();
@@ -117,7 +119,11 @@ class ClassDefinition {
     return dependenciesList;
   }
 
-  ClassDefinition(this._name, [this._privateFields = false]);
+  ClassDefinition(
+    this._name, [
+    this._privateFields = false,
+    this._needConstructor = false,
+  ]);
 
   hasField(TypeDefinition otherField) {
     return fields.keys.firstWhere(
@@ -241,7 +247,7 @@ class ClassDefinition {
   String get _jsonGenFunc {
     final sb = StringBuffer();
     sb.write(
-      'Map<String, Object> toJson() {\n return {',
+      'Map<String, dynamic> toJson() {\n return {',
     );
     fields.keys.forEach((k) {
       if (privateFields) {
@@ -303,10 +309,10 @@ class ClassDefinition {
   String toString() {
     if (privateFields) {
       // return 'class $name {\n$_fieldList\n\n$_defaultPrivateConstructor\n\n$_gettersSetters\n\n$_jsonParseFunc\n\n$_jsonGenFunc\n\n$_copyWithFunc\n\n$_equalFunc\n\n$_hashCodeFunc\n\n$_toStringFunc\n}\n';
-      return 'class $name {\n$_fieldList\n\n$_defaultPrivateConstructor\n\n$_jsonParseFunc\n\n$_jsonGenFunc\n\n$_toStringFunc\n}\n';
+      return 'class $name {\n$_fieldList\n\n${needConstructor ? _defaultPrivateConstructor : ''}\n\n$_jsonParseFunc\n\n$_jsonGenFunc\n\n$_toStringFunc\n}\n';
     } else {
       // return 'class $name {\n$_fieldList\n\n$_defaultConstructor\n\n$_jsonParseFunc\n\n$_jsonGenFunc\n\n$_copyWithFunc\n\n$_equalFunc\n\n$_hashCodeFunc\n\n$_toStringFunc\n}\n';
-      return 'class $name {\n$_fieldList\n\n$_defaultConstructor\n\n$_jsonParseFunc\n\n$_jsonGenFunc\n\n$_toStringFunc\n}\n';
+      return 'class $name {\n$_fieldList\n\n${needConstructor ? _defaultConstructor : ''}\n\n$_jsonParseFunc\n\n$_jsonGenFunc\n\n$_toStringFunc\n}\n';
     }
   }
 }

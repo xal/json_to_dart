@@ -6,9 +6,14 @@ import './syntax.dart';
 class ModelGenerator {
   final String _rootClassName;
   final bool _privateFields;
+  final bool _needConstructor;
   List<ClassDefinition> allClasses = List<ClassDefinition>();
 
-  ModelGenerator(this._rootClassName, [this._privateFields = false]);
+  ModelGenerator(
+    this._rootClassName, [
+    this._privateFields = true,
+    this._needConstructor = false,
+  ]);
 
   _generateClassDefinition(String className, Map<String, dynamic> jsonRawData) {
     if (jsonRawData is List) {
@@ -19,7 +24,11 @@ class ModelGenerator {
       );
     } else {
       final keys = jsonRawData.keys;
-      final classDefinition = ClassDefinition(className, _privateFields);
+      final classDefinition = ClassDefinition(
+        className,
+        _privateFields,
+        _needConstructor,
+      );
       keys.forEach((key) {
         final typeDef = TypeDefinition.fromDynamic(jsonRawData[key]);
         if (typeDef.type == 'Class') {
