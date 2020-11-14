@@ -173,6 +173,21 @@ class ClassDefinition {
     }).join('');
   }
 
+  String get _getters {
+    return fields.keys.map((key) {
+      final f = fields[key];
+      final publicFieldName =
+          fixFieldName(key, typeDef: f, privateField: false);
+      final privateFieldName =
+          fixFieldName(key, typeDef: f, privateField: true);
+      final sb = StringBuffer();
+      sb.write('');
+      _addTypeDef(f, sb);
+      sb.write(' get $publicFieldName => $privateFieldName;');
+      return sb.toString();
+    }).join('');
+  }
+
   String get _gettersSetters {
     return fields.keys.map((key) {
       final f = fields[key];
@@ -309,7 +324,7 @@ class ClassDefinition {
   String toString() {
     if (privateFields) {
       // return 'class $name {\n$_fieldList\n\n$_defaultPrivateConstructor\n\n$_gettersSetters\n\n$_jsonParseFunc\n\n$_jsonGenFunc\n\n$_copyWithFunc\n\n$_equalFunc\n\n$_hashCodeFunc\n\n$_toStringFunc\n}\n';
-      return 'class $name {\n$_fieldList\n\n${needConstructor ? _defaultPrivateConstructor : ''}\n\n$_jsonParseFunc\n\n$_jsonGenFunc\n\n$_toStringFunc\n}\n';
+      return 'class $name {\n$_fieldList\n\n${needConstructor ? _defaultPrivateConstructor : ''}\n\n$_jsonParseFunc\n\n$_jsonGenFunc\n\n$_toStringFunc\n}\n ${privateFields ? 'extension ${name}X on $name { $_getters }' : '' }';
     } else {
       // return 'class $name {\n$_fieldList\n\n$_defaultConstructor\n\n$_jsonParseFunc\n\n$_jsonGenFunc\n\n$_copyWithFunc\n\n$_equalFunc\n\n$_hashCodeFunc\n\n$_toStringFunc\n}\n';
       return 'class $name {\n$_fieldList\n\n${needConstructor ? _defaultConstructor : ''}\n\n$_jsonParseFunc\n\n$_jsonGenFunc\n\n$_toStringFunc\n}\n';
