@@ -14,7 +14,7 @@ class TypeDefinition {
         firstElementType = getTypeName(list[0]);
       } else {
         // when array is empty insert Null just to warn the user
-        firstElementType = "Null";
+        firstElementType = "dynamic";
       }
       return TypeDefinition(type, subtype: firstElementType);
     }
@@ -324,7 +324,7 @@ class ClassDefinition {
   String toString() {
     if (privateFields) {
       // return 'class $name {\n$_fieldList\n\n$_defaultPrivateConstructor\n\n$_gettersSetters\n\n$_jsonParseFunc\n\n$_jsonGenFunc\n\n$_copyWithFunc\n\n$_equalFunc\n\n$_hashCodeFunc\n\n$_toStringFunc\n}\n';
-      return 'class $name {\n$_fieldList\n\n${needConstructor ? _defaultPrivateConstructor : ''}\n\n$_jsonParseFunc\n\n$_jsonGenFunc\n\n$_toStringFunc\n}\n ${privateFields ? 'extension ${name}X on $name { $_getters }' : '' }';
+      return 'class $name {\n$_fieldList\n\n${needConstructor ? _defaultPrivateConstructor : ''}\n\n$_jsonParseFunc\n\n$_jsonGenFunc\n\n$_toStringFunc\n}\n ${privateFields ? 'extension ${name}X on $name { $_getters }' : ''}';
     } else {
       // return 'class $name {\n$_fieldList\n\n$_defaultConstructor\n\n$_jsonParseFunc\n\n$_jsonGenFunc\n\n$_copyWithFunc\n\n$_equalFunc\n\n$_hashCodeFunc\n\n$_toStringFunc\n}\n';
       return 'class $name {\n$_fieldList\n\n${needConstructor ? _defaultConstructor : ''}\n\n$_jsonParseFunc\n\n$_jsonGenFunc\n\n$_toStringFunc\n}\n';

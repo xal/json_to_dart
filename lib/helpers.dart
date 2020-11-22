@@ -1,4 +1,5 @@
 import 'dart:convert' as Convert;
+
 import './syntax.dart';
 
 const Map<String, bool> PRIMITIVE_TYPES = const {
@@ -71,7 +72,7 @@ String getTypeName(dynamic obj) {
   } else if (obj is bool) {
     return 'bool';
   } else if (obj == null) {
-    return 'Null';
+    return 'dynamic';
   } else if (obj is List) {
     return 'List';
   } else {
