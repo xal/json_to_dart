@@ -12,6 +12,7 @@ const Map<String, bool> PRIMITIVE_TYPES = const {
   'List<String>': true,
   'List<bool>': true,
   'Null': true,
+  'dynamic': true,
 };
 
 String camelCase(String text) {
