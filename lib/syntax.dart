@@ -57,14 +57,13 @@ class TypeDefinition {
       if (type == "List") {
         return "bean.$fieldKey = json['$key'].cast<$subtype>();";
       }
-      // return "bean.$fieldKey = json['$key']/* as $type */;";
       return "bean.$fieldKey = json['$key'];";
     } else if (type == 'List') {
       // list of class
       return "if (json['$key'] != null) { bean.$fieldKey = <$subtype>[for (final item in json['$key'] ?? []) $subtype.fromJson(item)]; }";
     } else {
       // class
-      return "bean.$fieldKey = ${_buildParseClass(jsonKey)};";
+      return "bean.$fieldKey = json['$key'] != null ? ${_buildParseClass(jsonKey)} : null;";
     }
   }
 
@@ -250,7 +249,6 @@ class ClassDefinition {
   String get _jsonParseFunc {
     final sb = StringBuffer();
     sb.write('static $name fromJson(Map<dynamic, dynamic> json) {');
-    sb.write('if (json == null) return null;\n');
     sb.write('final bean = $name();');
     fields.keys.forEach((k) {
       sb.write(fields[k].jsonParseExpression(k, privateFields));
@@ -261,15 +259,17 @@ class ClassDefinition {
 
   String get _jsonGenFunc {
     final sb = StringBuffer();
-    sb.write(
-      'Map<String, dynamic> toJson() {\n return {',
-    );
-    fields.keys.forEach((k) {
-      if (privateFields) {
-        sb.write('\'$k\': _$k,');
+    sb.write('Map<String, dynamic> toJson() {\n return {');
+    fields.forEach((name, type) {
+      String fieldName = name;
+      if (privateFields) fieldName = '_$name';
+
+      if (type.isPrimitive || type.isPrimitiveList) {
+        sb.write('\'$name\': $fieldName,');
       } else {
-        sb.write('\'$k\': $k,');
+        sb.write('\'$name\': $fieldName.toJson(),');
       }
+      // TODO 处理对象列表的情况
     });
     sb.write('};}');
     return sb.toString();
@@ -279,15 +279,15 @@ class ClassDefinition {
     final sb = StringBuffer();
     sb.write('$name copyWith({');
     fields.keys.forEach((k) => sb.write('${fields[k].type} $k,'));
-    sb.write('}) { return $name(');
-    fields.keys.forEach((k) => sb.write('$k: $k ?? this.$k,'));
-    sb.write('); }');
+    sb.write('}) { return $name()');
+    fields.keys.forEach((k) => sb.write('.._$k = $k ?? _$k'));
+    sb.write('; }');
     return sb.toString();
   }
 
   String get _toStringFunc {
     return '@override String toString() {'
-        ' return JsonEncoder.withIndent(\'  \').convert(toJson()); '
+        ' return const JsonEncoder.withIndent(\'  \').convert(toJson()); '
         '}';
   }
 
