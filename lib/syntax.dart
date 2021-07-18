@@ -61,7 +61,7 @@ class TypeDefinition {
       return "bean.$fieldKey = json['$key'];";
     } else if (type == 'List') {
       // list of class
-      return "if (json['$key'] != null) { bean.$fieldKey = <$subtype>[for (final item in json['$key']) $subtype.fromJson(item)]; }";
+      return "if (json['$key'] != null) { bean.$fieldKey = <$subtype>[for (final item in json['$key'] ?? []) $subtype.fromJson(item)]; }";
     } else {
       // class
       return "bean.$fieldKey = ${_buildParseClass(jsonKey)};";
@@ -109,7 +109,7 @@ class ClassDefinition {
   bool get needConstructor => _needConstructor;
 
   List<Dependency> get dependencies {
-    final dependenciesList = List<Dependency>();
+    final dependenciesList = <Dependency>[];
     final keys = fields.keys;
     keys.forEach((k) {
       if (!fields[k].isPrimitive) {
@@ -249,7 +249,7 @@ class ClassDefinition {
 
   String get _jsonParseFunc {
     final sb = StringBuffer();
-    sb.write('static $name fromJson(Map<String, dynamic> json) {');
+    sb.write('static $name fromJson(Map<dynamic, dynamic> json) {');
     sb.write('if (json == null) return null;\n');
     sb.write('final bean = $name();');
     fields.keys.forEach((k) {
@@ -324,10 +324,10 @@ class ClassDefinition {
   String toString() {
     if (privateFields) {
       // return 'class $name {\n$_fieldList\n\n$_defaultPrivateConstructor\n\n$_gettersSetters\n\n$_jsonParseFunc\n\n$_jsonGenFunc\n\n$_copyWithFunc\n\n$_equalFunc\n\n$_hashCodeFunc\n\n$_toStringFunc\n}\n';
-      return 'class $name {\n$_fieldList\n\n${needConstructor ? _defaultPrivateConstructor : ''}\n\n$_jsonParseFunc\n\n$_jsonGenFunc\n\n$_toStringFunc\n}\n ${privateFields ? 'extension ${name}X on $name { $_getters }' : ''}';
+      return 'class $name {\n$_fieldList\n\n${needConstructor ? _defaultPrivateConstructor : ''}\n\n$_jsonParseFunc\n\n$_jsonGenFunc\n\n$_copyWithFunc\n\n$_toStringFunc\n}\n ${privateFields ? 'extension ${name}X on $name { $_getters }' : ''}';
     } else {
       // return 'class $name {\n$_fieldList\n\n$_defaultConstructor\n\n$_jsonParseFunc\n\n$_jsonGenFunc\n\n$_copyWithFunc\n\n$_equalFunc\n\n$_hashCodeFunc\n\n$_toStringFunc\n}\n';
-      return 'class $name {\n$_fieldList\n\n${needConstructor ? _defaultConstructor : ''}\n\n$_jsonParseFunc\n\n$_jsonGenFunc\n\n$_toStringFunc\n}\n';
+      return 'class $name {\n$_fieldList\n\n${needConstructor ? _defaultConstructor : ''}\n\n$_jsonParseFunc\n\n$_jsonGenFunc\n\n$_copyWithFunc\n\n$_toStringFunc\n}\n';
     }
   }
 }

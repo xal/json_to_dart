@@ -7,7 +7,7 @@ class ModelGenerator {
   final String _rootClassName;
   final bool _privateFields;
   final bool _needConstructor;
-  List<ClassDefinition> allClasses = List<ClassDefinition>();
+  List<ClassDefinition> allClasses = [];
 
   ModelGenerator(
     this._rootClassName, [
