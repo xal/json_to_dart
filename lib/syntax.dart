@@ -60,7 +60,7 @@ class TypeDefinition {
       return "bean.$fieldKey = json['$key'];";
     } else if (type == 'List') {
       // list of class
-      return "if (json['$key'] != null) { bean.$fieldKey = <$subtype>[for (final item in json['$key'] ?? []) $subtype.fromJson(item)]; }";
+      return "if (json['$key'] != null) { bean.$fieldKey = <$subtype>[for (final item in json['$key']) $subtype.fromJson(item)]; }";
     } else {
       // class
       return "bean.$fieldKey = json['$key'] != null ? ${_buildParseClass(jsonKey)} : null;";
@@ -266,10 +266,11 @@ class ClassDefinition {
 
       if (type.isPrimitive || type.isPrimitiveList) {
         sb.write('\'$name\': $fieldName,');
+      } else if (type.subtype != null) {
+        sb.write('\'$name\': [for (final item in $fieldName) item.toJson()],');
       } else {
         sb.write('\'$name\': $fieldName.toJson(),');
       }
-      // TODO 处理对象列表的情况
     });
     sb.write('};}');
     return sb.toString();
