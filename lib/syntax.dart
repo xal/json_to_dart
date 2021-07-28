@@ -267,7 +267,8 @@ class ClassDefinition {
       if (type.isPrimitive || type.isPrimitiveList) {
         sb.write('\'$name\': $fieldName,');
       } else if (type.subtype != null) {
-        sb.write('\'$name\': [for (final item in $fieldName) item.toJson()],');
+        sb.write(
+            '\'$name\': [for (final item in $fieldName ?? []) item.toJson()],');
       } else {
         sb.write('\'$name\': $fieldName.toJson(),');
       }
