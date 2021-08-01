@@ -2,4 +2,4 @@
 The first parameter is the class name, and the second parameter is the json string
 
 编译命令:
-dart2native lib/main.dart -o json2dart
+dart compile exe lib/main.dart -o json2dart
